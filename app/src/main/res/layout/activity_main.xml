@@ -1,56 +1,60 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity"
-    android:background="@color/colorPrimary">
+    android:background="@color/colorPrimary"
+    tools:context=".MainActivity">
 
     <TextView
         android:id="@+id/tv_sugg"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="suggest to?"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="24dp"
         android:fontFamily="@font/adv_r"
-        android:textStyle="bold"
-        android:textSize="48sp"
+        android:text="@string/suggest_to"
         android:textColor="@color/colorAccent"
-        android:layout_marginLeft="30dp"
-        android:layout_marginTop="25dp"/>
-    <LinearLayout
+        android:textSize="48sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_wake"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/tv_sugg"
-        android:layout_marginTop="23dp"
-        android:layout_centerHorizontal="true">
-    <TextView
-    android:id="@+id/tv_wake"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:text="wake"
-    android:fontFamily="@font/adv_l"
-    android:textSize="34sp"
-    android:textColor="@color/colorAccent"
-        android:paddingLeft="9dp"
-        android:paddingRight="9dp"
-        android:paddingBottom="3dp"
-        android:background="@drawable/rect"/>
+        android:layout_marginStart="92dp"
+        android:layout_marginTop="32dp"
+        android:layout_marginEnd="16dp"
+        android:background="@drawable/rect"
+        android:fontFamily="@font/adv_l"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"
+        android:paddingBottom="4dp"
+        android:text="@string/wake"
+        android:textSize="34sp"
+        app:layout_constraintEnd_toStartOf="@+id/tv_sleep"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_sugg" />
 
     <TextView
         android:id="@+id/tv_sleep"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="sleep"
-        android:fontFamily="@font/adv_l"
-        android:layout_marginLeft="40dp"
-        android:textSize="34sp"
-        android:textColor="@color/colorAccent"
-        android:paddingLeft="9dp"
-        android:paddingRight="9dp"
-        android:paddingBottom="5dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="32dp"
+        android:layout_marginEnd="92dp"
         android:background="@drawable/rect"
+        android:fontFamily="@font/adv_l"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"
+        android:paddingBottom="4dp"
+        android:text="@string/sleep"
+        android:textSize="34sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/tv_wake"
+        app:layout_constraintTop_toBottomOf="@+id/tv_sugg" />
 
-        />
-    </LinearLayout>
-</RelativeLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
