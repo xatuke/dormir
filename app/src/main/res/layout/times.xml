@@ -1,53 +1,76 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="wrap_content"
-    android:background="@color/colorPrimary"
-    >
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/colorPrimary">
         <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="3dp"
-            android:layout_marginBottom="10dp">
+            android:layout_marginBottom="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginRight="35dp"
+            android:layout_marginLeft="35dp">
         <TextView
-            android:id="@+id/time1"
+            android:id="@+id/time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="TIME1"
+            android:text="10:32 AM"
             android:fontFamily="@font/adv_r"
             android:textColor="@color/colorAccent"
-            android:layout_marginBottom="5dp"
-            android:textSize="28sp"/>
+            android:textSize="38sp"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="8dp"/>
+            <TextView
+                android:id="@+id/n_cycles"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="3 Cycles"
+                android:layout_alignParentLeft="true"
+                android:fontFamily="@font/adv_r"
+                android:textColor="@color/colorAccent"
+                android:textSize="20sp"
+                android:layout_below="@id/time"
+                android:layout_marginLeft="8dp"
+                android:textAllCaps="true"
+                />
+        <ImageView
+            android:id="@+id/add_al"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/outline_add_alarm_white_48"
+            android:tint="@color/colorAccentLight"
+            android:layout_marginTop="4dp"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="16dp"
+            />
         <TextView
-            android:id="@+id/time2"
+            android:id="@+id/time_taken"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="TIME2"
+            android:text="1h 35m"
             android:fontFamily="@font/adv_r"
-            android:layout_toRightOf="@id/time1"
             android:textColor="@color/colorAccent"
-            android:layout_marginBottom="5dp"
-            android:layout_marginLeft="60dp"
-            android:textSize="28sp"/>
-        <TextView
-            android:id="@+id/time3"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="TIME3"
-            android:fontFamily="@font/adv_r"
-            android:layout_below="@id/time1"
-            android:textColor="@color/colorAccent"
-            android:textSize="28sp"/>
-        <TextView
-            android:id="@+id/time4"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="TIME4"
-            android:fontFamily="@font/adv_r"
-            android:layout_toRightOf="@id/time1"
-            android:layout_below="@id/time2"
-            android:layout_marginLeft="60dp"
-            android:textColor="@color/colorAccent"
-            android:textSize="28sp"/>
+            android:textSize="20sp"
+            android:layout_below="@id/add_al"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="8dp"
+            />
         </RelativeLayout>
-</RelativeLayout>
+        <ImageView
+            android:id="@+id/next_time"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_gravity="right|center_vertical"
+            android:src="@drawable/round_navigate_next_white_48"
+            android:layout_marginRight="4dp"
+            />
+        <ImageView
+            android:id="@+id/prev_time"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_gravity="left|center_vertical"
+            android:src="@drawable/round_navigate_next_white_48"
+            android:rotation="180"
+            android:layout_marginLeft="4dp"
+            />
+</FrameLayout>
