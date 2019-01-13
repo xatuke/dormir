@@ -1,81 +1,84 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/colorPrimary">
+    android:background="@color/colorPrimary"
+    android:orientation="vertical">
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="36sp"
-        android:fontFamily="@font/adv_r"
-        android:textColor="@color/colorAccent"
-        android:text="Donate"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:layout_marginLeft="8dp"
-        />
+        android:fontFamily="@font/adv_r"
+        android:text="@string/donate"
+        android:textColor="@color/colorAccent"
+        android:textSize="36sp" />
+
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="18sp"
-        android:fontFamily="@font/adv_r"
-        android:textColor="@color/colorAccentLight"
-        android:text="Choose donation amount:"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:layout_marginLeft="8dp"
-        />
+        android:fontFamily="@font/adv_r"
+        android:text="@string/choose_donation_amount"
+        android:textColor="@color/colorAccentLight"
+        android:textSize="18sp" />
 
     <RadioGroup
         android:id="@+id/which_food"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="8dp"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="8dp">
+
         <RadioButton
             android:id="@+id/coffee"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="20sp"
             android:fontFamily="@font/adv_r"
+            android:text="@string/cup_of_coffee"
             android:textColor="@color/colorAccent"
-            android:text=" 2$ - Cup of coffee"
-            />
+            android:textSize="20sp" />
+
         <RadioButton
             android:id="@+id/lunch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="20sp"
             android:fontFamily="@font/adv_r"
+            android:text="@string/alert_lunch"
             android:textColor="@color/colorAccent"
-            android:text=" 6$ - Lunch"
-            />
+            android:textSize="20sp" />
+
         <RadioButton
             android:id="@+id/meal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="20sp"
             android:fontFamily="@font/adv_r"
+            android:text="@string/nice_meal_for_two"
             android:textColor="@color/colorAccent"
-            android:text=" 30$ - Nice meal for two"
-            />
+            android:textSize="20sp" />
+
     </RadioGroup>
+
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="16sp"
-        android:fontFamily="@font/adv_r"
-        android:textColor="@color/colorAccent"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:layout_marginLeft="8dp"
-        android:text="Thank you for considering donating."/>
+        android:fontFamily="@font/adv_r"
+        android:text="@string/thank_you_for_considering_donating"
+        android:textColor="@color/colorAccent"
+        android:textSize="16sp" />
+
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="16sp"
+        android:layout_marginStart="8dp"
+        android:layout_marginBottom="8dp"
         android:fontFamily="@font/adv_r"
+        android:text="@string/donations_allow_me_to_work_more_on_the_app"
         android:textColor="@color/colorAccent"
-        android:layout_marginLeft="8dp"
-        android:text="Donations allow me to more on the app."
-        android:layout_marginBottom="8dp"/>
+        android:textSize="16sp" />
 
 </LinearLayout>

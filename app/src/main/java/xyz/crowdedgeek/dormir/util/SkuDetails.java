@@ -45,7 +45,7 @@ public class SkuDetails {
         mPrice = o.optString("price");
         mPriceAmountMicros = o.optLong("price_amount_micros");
         mPriceCurrencyCode = o.optString("price_currency_code");
-        mTitle = o.optString("title");
+        mTitle = o.optString("alert_title");
         mDescription = o.optString("description");
     }
 
