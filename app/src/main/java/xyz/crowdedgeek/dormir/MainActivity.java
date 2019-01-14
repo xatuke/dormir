@@ -3,7 +3,6 @@ package xyz.crowdedgeek.dormir;
 import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.ServiceConnection;
@@ -12,10 +11,9 @@ import android.net.NetworkInfo;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.provider.AlarmClock;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
@@ -32,46 +30,28 @@ import java.util.Date;
 
 public class MainActivity extends AppCompatActivity {
 
-    TextView suggtv, waketv, sleeptv;
-    String ti;
-    ImageView info;
-    FloatingActionButton donateBtn;
-    String base64EncodedPublicKey = "YOUR_KEY_HERE";
-    String sku;
-    IInAppBillingService mService;
-    ServiceConnection mServiceConn;
+    private String time;
+    private String base64EncodedPublicKey = "YOUR_KEY_HERE";
+    private String sku;
+    private IInAppBillingService mService;
+    public static final int REQUEST_CODE = 23423;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
-        getSupportActionBar().setCustomView(R.layout.ac_bar);
-        donateBtn = findViewById(R.id.donate_btn);
-        waketv = findViewById(R.id.tv_wake);
-        sleeptv = findViewById(R.id.tv_sleep);
-        donateBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                getDonations();
-            }
-        });
-        waketv.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                selectTimeDialog(true);
-            }
-        });
+        try {
+            getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+            getSupportActionBar().setCustomView(R.layout.action_bar);
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+        }
 
-        sleeptv.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                selectTimeDialog(false);
-            }
-        });
+        findViewById(R.id.fab_donate).setOnClickListener(v -> getDonations());
+        findViewById(R.id.tv_wake_up).setOnClickListener(v -> selectTimeDialog(true));
+        findViewById(R.id.tv_sleep).setOnClickListener(v -> selectTimeDialog(false));
 
-        suggtv = findViewById(R.id.tv_sugg);
-
-        mServiceConn = new ServiceConnection() {
+        ServiceConnection serviceConnection = new ServiceConnection() {
             @Override
             public void onServiceDisconnected(ComponentName name) {
                 mService = null;
@@ -86,66 +66,57 @@ public class MainActivity extends AppCompatActivity {
         Intent serviceIntent =
                 new Intent("com.android.vending.billing.InAppBillingService.BIND");
         serviceIntent.setPackage("com.android.vending");
-        bindService(serviceIntent, mServiceConn, Context.BIND_AUTO_CREATE);
+        bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE);
     }
 
     private void getDonations() {
-        AlertDialog.Builder b = new AlertDialog.Builder(MainActivity.this);
-        View v = View.inflate(MainActivity.this, R.layout.donate, null);
-        b.setView(v);
-        b.setPositiveButton("Donate", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                sku="";
-                boolean go = false;
-                RadioGroup radioGroup = v.findViewById(R.id.which_food);
-                if(radioGroup.getCheckedRadioButtonId() == R.id.coffee){
-                    sku = "coffee";
-                    go = true;
-                } else if(radioGroup.getCheckedRadioButtonId() == R.id.lunch){
-                    sku = "lunch";
-                    go = true;
-                } else if(radioGroup.getCheckedRadioButtonId() == R.id.meal){
-                    sku = "meal";
-                    go = true;
-                } else {
-                    Toast.makeText(MainActivity.this, "Please select an amount", Toast.LENGTH_SHORT).show();
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        View v = View.inflate(MainActivity.this, R.layout.alert_donate, null);
+        builder.setView(v);
+        builder.setPositiveButton(R.string.donate, (dialog, which) -> {
+            sku = "";
+            boolean go = true;
+            RadioGroup radioGroup = v.findViewById(R.id.which_food);
+            switch (radioGroup.getCheckedRadioButtonId()) {
+                case R.id.coffee:
+                    sku = getString(R.string.coffee);
+                    break;
+                case R.id.lunch:
+                    sku = getString(R.string.lunch);
+                    break;
+                case R.id.meal:
+                    sku = getString(R.string.meal);
+                    break;
+                default:
+                    go = false;
+                    Toast.makeText(MainActivity.this, getString(R.string.please_select_an_amount), Toast.LENGTH_SHORT).show();
                     getDonations();
-                }
-                if(go) {
-                    if(isNetworkAvailable()) {
-                        Bundle buyIntentBundle = null;
+                    break;
+            }
+            if (go)
+                if (isNetworkAvailable()) {
+                    Bundle buyIntentBundle = null;
+                    try {
+                        buyIntentBundle = mService.getBuyIntent(3, getPackageName(),
+                                sku, "inapp", base64EncodedPublicKey);
+                    } catch (RemoteException e) {
+                        e.printStackTrace();
+                    }
+                    if (buyIntentBundle != null) {
+                        PendingIntent pendingIntent = buyIntentBundle.getParcelable("BUY_INTENT");
                         try {
-                            buyIntentBundle = mService.getBuyIntent(3, getPackageName(),
-                                    sku, "inapp", base64EncodedPublicKey);
-                        } catch (RemoteException e) {
+                            startIntentSenderForResult(pendingIntent.getIntentSender(),
+                                    REQUEST_CODE, new Intent(), 0, 0, 0);
+                        } catch (IntentSender.SendIntentException e) {
                             e.printStackTrace();
                         }
-                        if(buyIntentBundle!=null) {
-                            PendingIntent pendingIntent = buyIntentBundle.getParcelable("BUY_INTENT");
-                            try {
-                                startIntentSenderForResult(pendingIntent.getIntentSender(),
-                                        23423, new Intent(), Integer.valueOf(0), Integer.valueOf(0),
-                                        Integer.valueOf(0));
-                            } catch (IntentSender.SendIntentException e) {
-                                e.printStackTrace();
-                            }
-                        } else {
-                            Toast.makeText(MainActivity.this, "Please try again!", Toast.LENGTH_SHORT).show();
-                        }
-                    } else {
-                        Toast.makeText(MainActivity.this, "No Internet Connection found!", Toast.LENGTH_SHORT).show();
-                    }
-                }
-            }
+                    } else
+                        Toast.makeText(MainActivity.this, getString(R.string.please_try_again), Toast.LENGTH_SHORT).show();
+                } else
+                    Toast.makeText(MainActivity.this, getString(R.string.no_internet_connection), Toast.LENGTH_SHORT).show();
         });
-        b.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        });
-        b.show();
+        builder.setNegativeButton(R.string.cancel, (dialog, which) -> dialog.dismiss());
+        builder.show();
     }
 
     private boolean isNetworkAvailable() {
@@ -155,116 +126,97 @@ public class MainActivity extends AppCompatActivity {
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
-
     private void selectTimeDialog(final boolean t) {
-        final AlertDialog.Builder b = new AlertDialog.Builder(MainActivity.this);
-        View v = View.inflate(MainActivity.this, R.layout.ald_tp, null);
-        final TimePicker picker = v.findViewById(R.id.timep);
-        b.setView(v);
-        b.setPositiveButton("calculate", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which){
-                        ti = String.valueOf(picker.getHour()).concat(":").concat(String.valueOf(picker.getMinute()));
-                        String times[];
-                        if(t){
-                            times = getWakeTimes(ti);
-                        }else{
-                            times = getSleepTimes(ti);
-                        }
-                        AlertDialog.Builder bl = new AlertDialog.Builder(MainActivity.this);
-                        View v = View.inflate(MainActivity.this, R.layout.times, null);
-                        final TextView time = v.findViewById(R.id.time);
-                        final TextView nCycles = v.findViewById(R.id.n_cycles);
-                        final TextView timeTaken = v.findViewById(R.id.time_taken);
-                        final ImageView addAlarm = v.findViewById(R.id.add_al);
-                        final ImageView nextTime = v.findViewById(R.id.next_time);
-                        final ImageView prevTime = v.findViewById(R.id.prev_time);
-                        time.setText(times[0]);
-                        nCycles.setText("6 CYCLES");
-                        timeTaken.setText("9h 15m");
-                        prevTime.setVisibility(View.GONE);
-                        prevTime.setEnabled(false);
-                        addAlarm.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                String tm = time.getText().toString();
-                                if(time.getText().toString().contains("AM") || time.getText().toString().contains("PM")) {
-                                    tm = convertTo24Hr(time.getText().toString());
-                                }
-                                addAlarm(tm);
-                            }
-                        });
+        final AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        View view = View.inflate(MainActivity.this, R.layout.alert_time_picker, null);
+        final TimePicker picker = view.findViewById(R.id.time_picker);
+        builder.setView(view);
+        builder.setPositiveButton(R.string.calculate, (dialog, which) -> {
+            time = String.valueOf(picker.getHour()).concat(":").concat(String.valueOf(picker.getMinute()));
+            String times[];
+            if (t)
+                times = getWakeTimes(time);
+            else
+                times = getSleepTimes(time);
+            AlertDialog.Builder builder1 = new AlertDialog.Builder(MainActivity.this);
+            View view1 = View.inflate(MainActivity.this, R.layout.alert_times, null);
+            final TextView time = view1.findViewById(R.id.alert_tv_time);
+            final TextView nCycles = view1.findViewById(R.id.alert_tv_cycles);
+            final TextView timeTaken = view1.findViewById(R.id.alert_tv_time_taken);
+            final ImageView addAlarm = view1.findViewById(R.id.alert_img_add_alarm);
+            final ImageView nextTime = view1.findViewById(R.id.alert_img_next_time);
+            final ImageView prevTime = view1.findViewById(R.id.alert_img_prev_time);
+            time.setText(times[0]);
+            nCycles.setText(getString(R.string.cycles, 6));
+            timeTaken.setText(getString(R.string.time_taken, 9, 15));
+            prevTime.setVisibility(View.GONE);
+            prevTime.setEnabled(false);
+            addAlarm.setOnClickListener(v1 -> {
+                String tm = time.getText().toString();
+                if (time.getText().toString().contains("AM") || time.getText().toString().contains("PM"))
+                    tm = convertTo24Hr(time.getText().toString());
+                addAlarm(tm);
+            });
 
-                        nextTime.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                if(time.getText().toString().equals(times[0])){
-                                    time.setText(times[1]);
-                                    prevTime.setVisibility(View.VISIBLE);
-                                    prevTime.setEnabled(true);
-                                    nCycles.setText("5 CYCLES");
-                                    timeTaken.setText("7h 45m");
-                                } else if(time.getText().toString().equals(times[1])){
-                                    time.setText(times[2]);
-                                    nCycles.setText("4 CYCLES");
-                                    timeTaken.setText("6h 15m");
-                                } else if(time.getText().toString().equals(times[2])){
-                                    time.setText(times[3]);
-                                    nCycles.setText("3 CYCLES");
-                                    timeTaken.setText("4h 45m");
-                                    nextTime.setEnabled(false);
-                                    nextTime.setVisibility(View.GONE);
-                                }
-                            }
-                        });
+            nextTime.setOnClickListener(v1 -> {
+                if (time.getText().toString().equals(times[0])) {
+                    time.setText(times[1]);
+                    prevTime.setVisibility(View.VISIBLE);
+                    prevTime.setEnabled(true);
+                    nCycles.setText(getString(R.string.cycles, 5));
+                    timeTaken.setText(getString(R.string.time_taken, 7, 45));
+                } else if (time.getText().toString().equals(times[1])) {
+                    time.setText(times[2]);
+                    nCycles.setText(getString(R.string.cycles, 4));
+                    timeTaken.setText(getString(R.string.time_taken, 6, 15));
+                } else if (time.getText().toString().equals(times[2])) {
+                    time.setText(times[3]);
+                    nCycles.setText(getString(R.string.cycles, 3));
+                    timeTaken.setText(getString(R.string.time_taken, 4, 45));
+                    nextTime.setEnabled(false);
+                    nextTime.setVisibility(View.GONE);
+                }
+            });
 
-                        prevTime.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                if(time.getText().toString().equals(times[1])){
-                                    prevTime.setVisibility(View.GONE);
-                                    time.setText(times[0]);
-                                    nCycles.setText("6 CYCLES");
-                                    timeTaken.setText("9h 15m");
-                                    prevTime.setEnabled(false);
-                                } else if(time.getText().toString().equals(times[2])){
-                                    time.setText(times[1]);
-                                    nCycles.setText("5 CYCLES");
-                                    timeTaken.setText("7h 45m");
-                                } else if(time.getText().toString().equals(times[3])){
-                                    time.setText(times[2]);
-                                    nCycles.setText("4 CYCLES");
-                                    timeTaken.setText("6h 15m");
-                                    nextTime.setEnabled(true);
-                                    nextTime.setVisibility(View.VISIBLE);
-                                }
-                            }
-                        });
+            prevTime.setOnClickListener(v1 -> {
+                if (time.getText().toString().equals(times[1])) {
+                    prevTime.setVisibility(View.GONE);
+                    time.setText(times[0]);
+                    nCycles.setText(getString(R.string.cycles, 6));
+                    timeTaken.setText(getString(R.string.time_taken, 9, 15));
+                    prevTime.setEnabled(false);
+                } else if (time.getText().toString().equals(times[2])) {
+                    time.setText(times[1]);
+                    nCycles.setText(getString(R.string.cycles, 5));
+                    timeTaken.setText(getString(R.string.time_taken, 7, 45));
+                } else if (time.getText().toString().equals(times[3])) {
+                    time.setText(times[2]);
+                    nCycles.setText(getString(R.string.cycles, 4));
+                    timeTaken.setText(getString(R.string.time_taken, 6, 15));
+                    nextTime.setEnabled(true);
+                    nextTime.setVisibility(View.VISIBLE);
+                }
+            });
 
-
-                        View vw = View.inflate(MainActivity.this, R.layout.title, null);
-                        if(t){
-                            ((TextView)vw.findViewById(R.id.wak_tv)).setText("wake up at");
-                        } else {
-                            ((TextView)vw.findViewById(R.id.wak_tv)).setText("sleep at");
-                        }
-                        bl.setCustomTitle(vw);
-                        bl.setView(v);
-                        bl.show();
-                    }
-                });
-        View vw = View.inflate(MainActivity.this, R.layout.title, null);
-        if(t){
-            ((TextView)vw.findViewById(R.id.wak_tv)).setText("sleep at?");
-        } else {
-            ((TextView)vw.findViewById(R.id.wak_tv)).setText("wake up at?");
-        }
-        b.setCustomTitle(vw);
-        b.show();
+            View view2 = View.inflate(MainActivity.this, R.layout.alert_title, null);
+            if (t)
+                ((TextView) view2.findViewById(R.id.alert_tv_title)).setText(getString(R.string.wake_up_at_));
+            else
+                ((TextView) view2.findViewById(R.id.alert_tv_title)).setText(getString(R.string.sleep_at_));
+            builder1.setCustomTitle(view2);
+            builder1.setView(view1);
+            builder1.show();
+        });
+        View view1 = View.inflate(MainActivity.this, R.layout.alert_title, null);
+        if (t)
+            ((TextView) view1.findViewById(R.id.alert_tv_title)).setText(getString(R.string.sleep_at));
+        else
+            ((TextView) view1.findViewById(R.id.alert_tv_title)).setText(getString(R.string.wake_up_at));
+        builder.setCustomTitle(view1);
+        builder.show();
     }
 
     private String convertTo24Hr(String s) {
-        String res = s;
         SimpleDateFormat displayFormat = new SimpleDateFormat("HH:mm");
         Date date = null;
         try {
@@ -272,45 +224,44 @@ public class MainActivity extends AppCompatActivity {
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        res = displayFormat.format(date);
-        return res;
+        return displayFormat.format(date);
     }
 
-    private void addAlarm(String tm) {
-        int hours = Integer.valueOf(tm.split(":")[0]);
-        int minutes = Integer.valueOf(tm.split(":")[1]);
+    private void addAlarm(String time) {
+        int hours = Integer.valueOf(time.split(":")[0]);
+        int minutes = Integer.valueOf(time.split(":")[1].substring(0,2));
         Intent i = new Intent(AlarmClock.ACTION_SET_ALARM);
         i.putExtra(AlarmClock.EXTRA_HOUR, hours);
         i.putExtra(AlarmClock.EXTRA_MINUTES, minutes);
         startActivity(i);
     }
 
-
-    private String[] getSleepTimes(String ti) {
+    private String[] getSleepTimes(String time) {
         String res[] = new String[4];
-        int hour = Integer.valueOf(ti.split(":")[0]);
-        int min = Integer.valueOf(ti.split(":")[1]);
+        int hour = Integer.valueOf(time.split(":")[0]);
+        int min = Integer.valueOf(time.split(":")[1]);
         TimeArithmetic arithmetic = new TimeArithmetic(hour, min, false);
 
-        res[0]=arithmetic.addOrSub(-9, -15);
-        res[1]=arithmetic.addOrSub(-7, -45);
-        res[2]=arithmetic.addOrSub(-6, -15);
-        res[3]=arithmetic.addOrSub(-4, -45);
+        res[0] = arithmetic.addOrSub(-9, -15);
+        res[1] = arithmetic.addOrSub(-7, -45);
+        res[2] = arithmetic.addOrSub(-6, -15);
+        res[3] = arithmetic.addOrSub(-4, -45);
 
         return res;
     }
 
-    private String[] getWakeTimes(String ti) {
+    private String[] getWakeTimes(String time) {
         String res[] = new String[4];
-        int hour = Integer.valueOf(ti.split(":")[0]);
-        int min = Integer.valueOf(ti.split(":")[1]);
+        int hour = Integer.valueOf(time.split(":")[0]);
+        int min = Integer.valueOf(time.split(":")[1]);
         TimeArithmetic arithmetic = new TimeArithmetic(hour, min, false);
 
-        res[0]=arithmetic.addOrSub(9, 15);
-        res[1]=arithmetic.addOrSub(7, 45);
-        res[2]=arithmetic.addOrSub(6, 15);
-        res[3]=arithmetic.addOrSub(4, 45);
+        res[0] = arithmetic.addOrSub(9, 15);
+        res[1] = arithmetic.addOrSub(7, 45);
+        res[2] = arithmetic.addOrSub(6, 15);
+        res[3] = arithmetic.addOrSub(4, 45);
 
         return res;
     }
+
 }

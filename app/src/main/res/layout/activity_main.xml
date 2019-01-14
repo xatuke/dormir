@@ -1,68 +1,73 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity"
-    android:background="@color/colorPrimary">
+    android:background="@color/colorPrimary"
+    tools:context=".MainActivity">
 
     <TextView
         android:id="@+id/tv_sugg"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="suggest to?"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
         android:fontFamily="@font/adv_r"
-        android:textStyle="bold"
-        android:textSize="48sp"
+        android:text="@string/suggest_to"
         android:textColor="@color/colorAccent"
-        android:layout_marginLeft="30dp"
-        android:layout_marginTop="25dp"/>
-    <LinearLayout
+        android:textSize="48sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_wake_up"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/tv_sugg"
-        android:layout_marginTop="23dp"
-        android:layout_centerHorizontal="true">
-    <TextView
-    android:id="@+id/tv_wake"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:text="wake"
-    android:fontFamily="@font/adv_l"
-    android:textSize="34sp"
-    android:textColor="@color/colorAccent"
+        android:layout_marginTop="32dp"
+        android:background="@drawable/rect"
+        android:fontFamily="@font/adv_l"
         android:paddingLeft="9dp"
         android:paddingRight="9dp"
         android:paddingBottom="3dp"
-        android:background="@drawable/rect"/>
+        android:text="@string/wake_up"
+        android:textColor="@color/colorAccent"
+        android:textSize="34sp"
+        app:layout_constraintEnd_toStartOf="@+id/tv_sleep"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_sugg" />
 
     <TextView
         android:id="@+id/tv_sleep"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="sleep"
+        android:background="@drawable/rect"
         android:fontFamily="@font/adv_l"
-        android:layout_marginLeft="40dp"
-        android:textSize="34sp"
-        android:textColor="@color/colorAccent"
         android:paddingLeft="9dp"
         android:paddingRight="9dp"
         android:paddingBottom="5dp"
-        android:background="@drawable/rect"
+        android:text="@string/sleep"
+        android:textColor="@color/colorAccent"
+        android:textSize="34sp"
+        app:layout_constraintBottom_toBottomOf="@+id/tv_wake_up"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/tv_wake_up"
+        app:layout_constraintTop_toTopOf="@+id/tv_wake_up" />
 
-        />
-    </LinearLayout>
-
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/donate_btn"
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_donate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
-        app:fabCustomSize="60dp"
-        android:elevation="8dp"
         android:layout_margin="16dp"
-        android:src="@drawable/outline_attach_money_black_48" />
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:elevation="8dp"
+        android:src="@drawable/outline_attach_money_black_48"
+        app:fabCustomSize="60dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
-</RelativeLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

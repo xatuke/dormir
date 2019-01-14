@@ -1,3 +1,27 @@
 <resources>
     <string name="app_name">dormir</string>
+    <string name="wake_up_at">wake up at?</string>
+    <string name="donate">Donate</string>
+    <string name="choose_donation_amount">Choose donation amount:</string>
+    <string name="cup_of_coffee">2$ - Cup of coffee</string>
+    <string name="alert_lunch">6$ - Lunch</string>
+    <string name="nice_meal_for_two">30$ - Nice meal for two</string>
+    <string name="thank_you_for_considering_donating">Thank you for considering donating.</string>
+    <string name="donations_allow_me_to_work_more_on_the_app">Donations allow me to work more on the app.</string>
+    <string name="sleep">sleep</string>
+    <string name="wake_up">wake up</string>
+    <string name="suggest_to">suggest to?</string>
+    <string name="coffee">coffee</string>
+    <string name="lunch">lunch</string>
+    <string name="meal">meal</string>
+    <string name="please_try_again">Please try again!</string>
+    <string name="no_internet_connection">No Internet Connection found!</string>
+    <string name="cancel">Cancel</string>
+    <string name="please_select_an_amount">Please select an amount</string>
+    <string name="sleep_at">sleep at?</string>
+    <string name="calculate">calculate</string>
+    <string name="cycles">%d CYCLES</string>
+    <string name="time_taken">%dh %dm</string>
+    <string name="wake_up_at_">wake up at</string>
+    <string name="sleep_at_">sleep at</string>
 </resources>
