@@ -1,30 +1,18 @@
 package xyz.crowdedgeek.dormir;
 
-import android.app.PendingIntent;
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentSender;
-import android.content.ServiceConnection;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-import android.os.IBinder;
-import android.os.RemoteException;
+import android.os.Build;
 import android.provider.AlarmClock;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.ImageView;
-import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.TimePicker;
-import android.widget.Toast;
-
-import com.android.vending.billing.IInAppBillingService;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -32,29 +20,19 @@ import java.util.Date;
 
 public class MainActivity extends AppCompatActivity {
 
-    TextView suggtv, waketv, sleeptv;
+    TextView waketv, sleeptv;
     String ti;
     ImageView info;
-    FloatingActionButton donateBtn;
-    String base64EncodedPublicKey = "YOUR_KEY_HERE";
-    String sku;
-    IInAppBillingService mService;
-    ServiceConnection mServiceConn;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
         getSupportActionBar().setCustomView(R.layout.ac_bar);
-        donateBtn = findViewById(R.id.donate_btn);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
+
         waketv = findViewById(R.id.tv_wake);
         sleeptv = findViewById(R.id.tv_sleep);
-        donateBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                getDonations();
-            }
-        });
         waketv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -69,92 +47,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        suggtv = findViewById(R.id.tv_sugg);
-
-        mServiceConn = new ServiceConnection() {
-            @Override
-            public void onServiceDisconnected(ComponentName name) {
-                mService = null;
-            }
-
-            @Override
-            public void onServiceConnected(ComponentName name,
-                                           IBinder service) {
-                mService = IInAppBillingService.Stub.asInterface(service);
-            }
-        };
-        Intent serviceIntent =
-                new Intent("com.android.vending.billing.InAppBillingService.BIND");
-        serviceIntent.setPackage("com.android.vending");
-        bindService(serviceIntent, mServiceConn, Context.BIND_AUTO_CREATE);
     }
-
-    private void getDonations() {
-        AlertDialog.Builder b = new AlertDialog.Builder(MainActivity.this);
-        View v = View.inflate(MainActivity.this, R.layout.donate, null);
-        b.setView(v);
-        b.setPositiveButton("Donate", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                sku="";
-                boolean go = false;
-                RadioGroup radioGroup = v.findViewById(R.id.which_food);
-                if(radioGroup.getCheckedRadioButtonId() == R.id.coffee){
-                    sku = "coffee";
-                    go = true;
-                } else if(radioGroup.getCheckedRadioButtonId() == R.id.lunch){
-                    sku = "lunch";
-                    go = true;
-                } else if(radioGroup.getCheckedRadioButtonId() == R.id.meal){
-                    sku = "meal";
-                    go = true;
-                } else {
-                    Toast.makeText(MainActivity.this, "Please select an amount", Toast.LENGTH_SHORT).show();
-                    getDonations();
-                }
-                if(go) {
-                    if(isNetworkAvailable()) {
-                        Bundle buyIntentBundle = null;
-                        try {
-                            buyIntentBundle = mService.getBuyIntent(3, getPackageName(),
-                                    sku, "inapp", base64EncodedPublicKey);
-                        } catch (RemoteException e) {
-                            e.printStackTrace();
-                        }
-                        if(buyIntentBundle!=null) {
-                            PendingIntent pendingIntent = buyIntentBundle.getParcelable("BUY_INTENT");
-                            try {
-                                startIntentSenderForResult(pendingIntent.getIntentSender(),
-                                        23423, new Intent(), Integer.valueOf(0), Integer.valueOf(0),
-                                        Integer.valueOf(0));
-                            } catch (IntentSender.SendIntentException e) {
-                                e.printStackTrace();
-                            }
-                        } else {
-                            Toast.makeText(MainActivity.this, "Please try again!", Toast.LENGTH_SHORT).show();
-                        }
-                    } else {
-                        Toast.makeText(MainActivity.this, "No Internet Connection found!", Toast.LENGTH_SHORT).show();
-                    }
-                }
-            }
-        });
-        b.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        });
-        b.show();
-    }
-
-    private boolean isNetworkAvailable() {
-        ConnectivityManager connectivityManager
-                = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
-    }
-
 
     private void selectTimeDialog(final boolean t) {
         final AlertDialog.Builder b = new AlertDialog.Builder(MainActivity.this);
@@ -164,7 +57,11 @@ public class MainActivity extends AppCompatActivity {
         b.setPositiveButton("calculate", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which){
-                        ti = String.valueOf(picker.getHour()).concat(":").concat(String.valueOf(picker.getMinute()));
+                        if(Build.VERSION.SDK_INT < 23){
+                            ti = String.valueOf(picker.getCurrentHour()).concat(":").concat(String.valueOf(picker.getCurrentMinute()));
+                        } else{
+                            ti = String.valueOf(picker.getHour()).concat(":").concat(String.valueOf(picker.getMinute()));
+                        }
                         String times[];
                         if(t){
                             times = getWakeTimes(ti);
